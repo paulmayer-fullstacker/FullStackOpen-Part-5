@@ -1,0 +1,79 @@
+#
+# Blog List API Test Requests
+#
+# Requires: VS Code REST Client extension
+# Base URL: http://localhost:3002 (as configured in .env and index.js)
+#
+
+####### Ex 4.15 - 4.23
+
+### Base URL for our API
+@baseUrl = http://localhost:3002
+
+### Variable to store auth token after login
+# Tokens are received in quots ("token"). Howver they are copied here directly (token).
+# Example: @authToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJpYXQiOjE2NzEwMDAwMDAsImV4cCI6MTY3MTAwMzYwMH0.signature
+@authToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InJlc3QtY2xpZW50LXVzZXI0IiwiaWQiOiI2OTAzNzQ5NDMyZmI4NDQwN2U3MDVhMGYiLCJpYXQiOjE3NjE4MzQxNDh9.UVz3eJFA06r3MLil2ccXfoIv8CDNrtBRC3T_0SUU4Ag
+# Every time we receive a new token, in a response, we need to copy that token to my @authToken variable for further transactions to work
+
+
+### Create new users api/users. Users have a username, password and name.
+POST {{baseUrl}}/api/users
+Content-Type: application/json
+
+{
+"username": "rest-client-user4",
+"name": "RestClient User4",
+"password": "user4password"
+}
+
+### Get list of all users from the database.
+
+GET {{baseUrl}}/api/users
+
+
+### Get all blogs
+
+GET {{baseUrl}}/api/blogs
+
+
+### 1. LOGIN to get a valid Token (Run this before post new blog or delete blog)
+# Place the token in the @authToken variable.
+POST {{baseUrl}}/api/login
+Content-Type: application/json
+
+{
+    "username": "rest-client-user4",
+    "password": "user4password"
+}
+
+
+### LOGIN Example (Requires successful user creation first)
+POST {{baseUrl}}/api/login
+Content-Type: application/json
+
+{
+    "username": "rest-client-user3",
+    "password": "user3password"
+}
+
+
+### Create a New Blog (Requires Authentication/Token)
+POST {{baseUrl}}/api/blogs
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "title": "REST Client with JWT Authentication Blog Post 22",
+  "url": "http://example.com/rest-client-post-jwt/22",
+  "likes": 10,
+  "userId": "6900cef23f7621b9d21497ec"
+}
+
+
+### Delete a Blog
+@blogIdToDelete = 690374c132fb84407e705a14
+DELETE {{baseUrl}}/api/blogs/{{blogIdToDelete}}
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
