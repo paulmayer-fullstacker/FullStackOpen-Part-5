@@ -8,7 +8,7 @@ blogsRouter.get('/', async (request, response, next) => {
   try {
     // Find all blogs from the database
     const blogs = await Blog
-      .find({}).populate('user', { username: 1, name: 1 })
+      .find({}).populate('user', { username: 1, name: 1, id: 1 })
     // Send the fetched blogs back to the client. The response is returned as the blogs in a JSON format
     response.json(blogs)
   } catch (exception) {
@@ -40,8 +40,10 @@ blogsRouter.post('/', middleware.userExtractor, async (request, response, next) 
     const savedBlog = await blog.save()    // Saves the new blog document to the MongoDB database.
     user.blogs = user.blogs.concat(savedBlog._id)
     await user.save()
+    // Populate the user data before sending the response
+    const populatedBlog = await savedBlog.populate('user', { username: 1, name: 1, id: 1 })
     // Send a 201 Created status code and the saved document back.
-    response.status(201).json(savedBlog)
+    response.status(201).json(populatedBlog)
   } catch (exception) {
     // Errors from validation (like missing title/url) or database connection are passed to error handling middleware.
     next(exception)
@@ -73,6 +75,29 @@ blogsRouter.delete('/:id', middleware.userExtractor, async (request, response, n
 
     response.status(204).end()
   } catch (exception) {
+    next(exception)
+  }
+})
+
+// Route to increment likes.
+blogsRouter.put('/:id/like', async (request, response, next) => {
+  const blogId = request.params.id
+
+  try {
+    // $inc operator atomically increments the field
+    const updatedBlog = await Blog.findByIdAndUpdate(
+      blogId,
+      { $inc: { likes: 1 } },
+      { new: true } // Return the updated document
+    ).populate('user', { username: 1, name: 1, id: 1 }) // Repopulate user for consistency
+
+    if (updatedBlog) {
+      response.status(200).json(updatedBlog)
+    } else {
+      response.status(404).json({ error: 'Blog not found' })
+    }
+  } catch (exception) {
+    // Pass errors (e.g., CastError from bad ID) to middleware
     next(exception)
   }
 })

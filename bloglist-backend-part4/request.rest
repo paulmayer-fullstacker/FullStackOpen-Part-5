@@ -13,7 +13,7 @@
 ### Variable to store auth token after login
 # Tokens are received in quots ("token"). Howver they are copied here directly (token).
 # Example: @authToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJpYXQiOjE2NzEwMDAwMDAsImV4cCI6MTY3MTAwMzYwMH0.signature
-@authToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InJlc3QtY2xpZW50LXVzZXI0IiwiaWQiOiI2OTAzNzQ5NDMyZmI4NDQwN2U3MDVhMGYiLCJpYXQiOjE3NjE4MzQxNDh9.UVz3eJFA06r3MLil2ccXfoIv8CDNrtBRC3T_0SUU4Ag
+@authToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNlZWRlZGF1dGhvcjEiLCJpZCI6IjY5MDM3YTEzNWQ3NGY3NjY5N2JmYjg3ZSIsImlhdCI6MTc2MzU5NjUzNX0.wDBGcNGah_txtjpTuOrRvtOQlD2_gSOnAagTo3QEqKI
 # Every time we receive a new token, in a response, we need to copy that token to my @authToken variable for further transactions to work
 
 
@@ -43,8 +43,8 @@ POST {{baseUrl}}/api/login
 Content-Type: application/json
 
 {
-    "username": "rest-client-user4",
-    "password": "user4password"
+    "username": "seededauthor1",
+    "password": "password1234"
 }
 
 
@@ -70,9 +70,14 @@ Authorization: Bearer {{authToken}}
   "userId": "6900cef23f7621b9d21497ec"
 }
 
+### Like Blog: increment the blog's like count
+@blogIdToLike = 69037a135d74f76697bfb882
+PUT {{baseUrl}}/api/blogs/{{blogIdToLike}}/like
+Content-Type: application/json
+
 
 ### Delete a Blog
-@blogIdToDelete = 690374c132fb84407e705a14
+@blogIdToDelete = 691e5925f6e0d28925877c7c
 DELETE {{baseUrl}}/api/blogs/{{blogIdToDelete}}
 Content-Type: application/json
 Authorization: Bearer {{authToken}}

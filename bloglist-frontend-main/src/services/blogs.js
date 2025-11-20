@@ -26,10 +26,29 @@ const update = (id, newObject) => {
   return request.then(response => response.data)
 }
 
+// Function to 'like' specific blog.
+const like = async (id) => {
+  // Use dedicated 'like' endpoint: /api/blogs/:id/like
+  const response = await axios.put(`${baseUrl}/${id}/like`) 
+  return response.data
+}
+
+// Function to remove (delete) a blog post
+const remove = async (id) => {
+  const config = {
+    headers: { Authorization: token } // Pass JWT token for authentication. Only authenticated users (the creator) can delete subject blog.
+  }
+  // Send DELETE request to the backend
+  const response = await axios.delete(`${baseUrl}/${id}`, config)
+  return response.data
+}
+
 
 export default { 
   getAll,
   create,
   update,
+  like,
+  remove,
   setToken
 }

@@ -18,7 +18,7 @@ const App = () => {
   const [notificationMessage, setNotificationMessage] = useState(null)
   const [notificationType, setNotificationType] = useState(null)
 
-  // 1. Create a ref for the Togglable component
+  // Create a ref for the Togglable component
   const blogFormRef = useRef()
 
   const showNotification = (message, type) => {
@@ -30,13 +30,15 @@ const App = () => {
     }, 10000)
   }
 
-  // Helper function to fetch blogs
+  // --- FIX: Logic to handle fetching blogs ---
   const fetchBlogs = async () => {
     try {
       const initialBlogs = await blogService.getAll()
+      // Optional: Add a safety map here if backend populating fails, but we rely on the backend being fixed/seeded now.
       setBlogs(initialBlogs)
     } catch (error) {
       console.error('Failed to fetch blogs:', error)
+      // Optional: show a failure notification
     }
   }
 
@@ -47,15 +49,17 @@ const App = () => {
       const user = JSON.parse(loggedUserJSON)
       setUser(user)
       blogService.setToken(user.token)
-      // FIX 1: Fetch blogs immediately after setting the user/token
+      // Call fetchBlogs immediately after setting the user/token
       fetchBlogs()
     } else {
-      // If no user is logged in, still fetch blogs (anonymous view)
+      // If no user is logged in, still fetch blogs (without token)
       fetchBlogs()
     }
   }, [])
-  // Note: The original initial blog fetch useEffect is now fully replaced by the above logic.
 
+  // NOTE: The original initial blog fetch useEffect is removed, as it's now handled
+  // by the session restoration/initial load logic above (via the call to fetchBlogs).
+  
   // Login handler
   const handleLogin = async event => {
       event.preventDefault()
@@ -70,7 +74,7 @@ const App = () => {
       setPassword('')
       showNotification(`Welcome, ${user.name}!`, 'success')
       
-      // FIX 2: Fetch blogs again immediately after a successful login
+      // FIX: Fetch blogs again immediately after a successful login
       fetchBlogs()
 
     } catch (exception) {
@@ -87,6 +91,7 @@ const App = () => {
     window.localStorage.removeItem('loggedBloglistUser')
     blogService.setToken(null)
     setUser(null)
+    // Clear blogs or re-fetch as anonymous user might be desired
     setBlogs([]) // Clear list to force a clean slate until next fetch
     fetchBlogs() // Re-fetch as anonymous user
   }
@@ -94,10 +99,12 @@ const App = () => {
   // Blog creation handler
   const handleCreateNewBlog = async (blogObject) => {
     try {
-      // Send the new blog object to the backend
       const returnedBlog = await blogService.create(blogObject)
 
-      // Update local blogs state with the new blog (relying on backend populating user)
+      // The backend should return the populated user object, so we rely on that.
+      // We no longer manually construct the user object here, as the backend populates it.
+      
+      // Update local blogs state with the new blog
       setBlogs(blogs.concat(returnedBlog))
 
       // Hide the form using the ref.
@@ -115,7 +122,7 @@ const App = () => {
     }
   }
 
-  // Handler for the 'Like' button click
+  // Handler for the 'Like' button click (No changes needed)
   const handleLike = async (blogId) => {
     try {
       const updatedBlog = await blogService.like(blogId)
@@ -134,13 +141,9 @@ const App = () => {
     }
   }
 
-  // Handler for the 'Remove' button click
+  // Handler for the 'Remove' button click (No changes needed)
   const handleRemove = async (blog) => {
-    // FIX 3: Use optional chaining for safe access to user properties in confirmation message
-    const ownerName = blog.user?.name || blog.user?.username || 'Unknown Author'
-    const confirmed = window.confirm(`Remove blog ${blog.title} by ${ownerName}?`)
-    
-    // On confirmation:
+    const confirmed = window.confirm(`Remove blog ${blog.title} by ${blog.user.name || blog.user.username}?`)
     if (confirmed) {
       try {
         await blogService.remove(blog.id)
@@ -157,7 +160,7 @@ const App = () => {
     }
   }
 
-  // Conditional Rendering for Login Form
+  // Conditional Rendering for Login Form (no changes needed here)
   if (user === null) {
     return (
       <div>
@@ -165,6 +168,7 @@ const App = () => {
         <h2>Log in to application</h2>
 
         <form onSubmit={handleLogin}>
+          {/* ... login inputs ... */}
           <div>
             username
             <input type="text" value={username} name="Username"
@@ -179,12 +183,12 @@ const App = () => {
         </form>
         
         {/* Render blogs here for anonymous users if they exist */}
-        {blogs.length > 0 && <h3>Available Blogs</h3>}
+        {blogs.length > 0 && <h3>Available Blogs (Anonymous)</h3>}
         {blogs.map(blog => 
             <Blog
                 key={blog.id}
                 blog={blog}
-                // Only basic view, no like/remove handlers for anonymous view
+                // No like/remove handlers for anonymous view
             />
         )}
       </div>
@@ -192,7 +196,7 @@ const App = () => {
   }
 
   // Sort the blogs array by likes in descending order.
-  // FIX 4: Use || 0 to safely handle null/undefined likes property (prevents sort crash)
+  // The use of || 0 prevents crashes if 'likes' is missing or null.
   const sortedBlogArray = [...blogs].sort((a, b) => (b.likes || 0) - (a.likes || 0))
 
   // Logged-in view

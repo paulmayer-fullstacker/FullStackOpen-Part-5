@@ -1,4 +1,4 @@
-// components/Blog.jsx
+// components/Blog.jsx:
 
 import { useState } from 'react'
 // Destructure the props
@@ -18,16 +18,19 @@ const Blog = ({ blog, handleLike, handleRemove, currentUser }) => {
 
   // Function to call the parent's remove handler
   const removeBlog = () => {
+    // Pass the entire blog object to the handler for the confirmation dialogue
     handleRemove(blog)
   }
 
   // Author Name: Prefer the full name if available, otherwise use the username.
+  // This uses optional chaining (?.) for safety if 'user' is null or not populated.
   const authorName = blog.user?.name || blog.user?.username || 'Unknown Author'
-  
-  // FIX: Use optional chaining (?.) on blog.user.id to prevent a crash 
-  // if 'id' is missing or null when the component renders.
-  const isCreator = blog.user && currentUser 
-    && (blog.user.id?.toString() === currentUser.id.toString())
+  // blog.user?.name : If blog.user exists (is not null or undefined), return its name property.
+  // blog.user?.username	Else, if the user object exists AND has a username, return the Username.
+  // 'Unknown Author'	Else (if neither of the above returned a valid name)...	Returns the literal string 'Unknown Author'
+
+  // Conditional rendering for the remove button. Check if the blog object has a user property and if that user's ID matches the logged-in user's ID
+  const isCreator = blog.user && currentUser && (blog.user.id.toString() === currentUser.id.toString())  // Enforce string comparison for robustness. Use parentheses to ensure toString() is called before comparison.
 
   // Styling
   const blogStyle = {
