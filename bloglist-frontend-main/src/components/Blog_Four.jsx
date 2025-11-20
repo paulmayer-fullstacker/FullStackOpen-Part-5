@@ -1,4 +1,5 @@
-// components/Blog.jsx:
+// components/Blog.jsx
+
 import { useState } from 'react'
 // Destructure the props
 const Blog = ({ blog, handleLike, handleRemove, currentUser }) => {
@@ -11,7 +12,6 @@ const Blog = ({ blog, handleLike, handleRemove, currentUser }) => {
   }
 
   // Calls the prop handleLike function with the blog's ID
-  // NOTE: This function will only be called if handleLike exists (see fullView below)
   const likeBlog = () => {
     handleLike(blog.id)
   }
@@ -23,9 +23,10 @@ const Blog = ({ blog, handleLike, handleRemove, currentUser }) => {
 
   // Author Name: Prefer the full name if available, otherwise use the username.
   const authorName = blog.user?.name || blog.user?.username || 'Unknown Author'
-
-  // Check if the current user is the creator of the blog. This requires both user and currentUser to exist.
-  const isCreator = blog.user && currentUser
+  
+  // FIX: Use optional chaining (?.) on blog.user.id to prevent a crash 
+  // if 'id' is missing or null when the component renders.
+  const isCreator = blog.user && currentUser 
     && (blog.user.id?.toString() === currentUser.id.toString())
 
   // Styling
@@ -53,19 +54,17 @@ const Blog = ({ blog, handleLike, handleRemove, currentUser }) => {
         {blog.title} {authorName}
         <button onClick={toggleVisibility}>hide</button>
       </div>
-
+      
       {/* Blog Details */}
       <div>{blog.url}</div>
       <div>
-        likes {blog.likes}
-        {/* FIX: Only render the 'like' button if the handleLike prop is provided (i.e., user is logged in) */}
-        {handleLike && <button onClick={likeBlog}>like</button>}
+        likes {blog.likes} <button onClick={likeBlog}>like</button>
       </div>
       {/* The author's name is displayed */}
       <div>{authorName}</div>
 
-      {/* Remove button, only shown if the current user created subject blog and handleRemove is provided */}
-      {isCreator && handleRemove && (
+      {/* Remove button, only shown if the current user created subject blog */}
+      {isCreator && (
         <button onClick={removeBlog}>remove</button>
       )}
     </div>

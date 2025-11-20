@@ -1,4 +1,4 @@
-// App.jsx:
+// App.jsx
 import { useState, useEffect, useRef } from 'react'
 import Blog from './components/Blog'
 import blogService from './services/blogs'
@@ -45,35 +45,22 @@ const App = () => {
     const loggedUserJSON = window.localStorage.getItem('loggedBloglistUser')
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON)
-      // Defensive check for token existence on refresh
-      if (user && user.token) {
-        setUser(user)
-        blogService.setToken(user.token)
-        // FIX 1: Fetch blogs immediately after setting the user/token
-        fetchBlogs()
-      } else {
-        // Clear broken token and fetch blogs anonymously if token is missing
-        window.localStorage.removeItem('loggedBloglistUser')
-        fetchBlogs()
-      }
+      setUser(user)
+      blogService.setToken(user.token)
+      // FIX 1: Fetch blogs immediately after setting the user/token
+      fetchBlogs()
     } else {
       // If no user is logged in, still fetch blogs (anonymous view)
       fetchBlogs()
     }
   }, [])
-
+  // Note: The original initial blog fetch useEffect is now fully replaced by the above logic.
 
   // Login handler
   const handleLogin = async event => {
-    event.preventDefault()
-    try {
+      event.preventDefault()
+      try {
       const user = await loginService.login({ username, password })
-
-      // Defensive check: Ensure user object and token exist before setting state/storage
-      if (!user || !user.token) {
-        throw new Error('Login response missing user data or token.')
-      }
-
       window.localStorage.setItem(
         'loggedBloglistUser', JSON.stringify(user)
       )
@@ -82,21 +69,16 @@ const App = () => {
       setUsername('')
       setPassword('')
       showNotification(`Welcome, ${user.name}!`, 'success')
-
+      
       // FIX 2: Fetch blogs again immediately after a successful login
       fetchBlogs()
 
     } catch (exception) {
-      // CRITICAL FIX: Extract the server's error message if available, otherwise use a generic message.
-      const errorMessage = exception.response
-        ? exception.response.data.error || 'wrong username or password'
-        : 'wrong username or password'
-
       showNotification(
-        errorMessage,
+        'wrong username or password',
         'failure'
       )
-      console.error('Login Error:', exception)
+      console.error('Wrong credentials', exception)
     }
   }
 
@@ -156,9 +138,8 @@ const App = () => {
   const handleRemove = async (blog) => {
     // FIX 3: Use optional chaining for safe access to user properties in confirmation message
     const ownerName = blog.user?.name || blog.user?.username || 'Unknown Author'
-    // NOTE: This window.confirm will not be visible in the canvas, but is fine for standard environment usage
     const confirmed = window.confirm(`Remove blog ${blog.title} by ${ownerName}?`)
-
+    
     // On confirmation:
     if (confirmed) {
       try {
@@ -176,9 +157,6 @@ const App = () => {
     }
   }
 
-  const sortedBlogArray = [...blogs].sort((a, b) => (b.likes || 0) - (a.likes || 0))
-
-
   // Conditional Rendering for Login Form
   if (user === null) {
     return (
@@ -188,7 +166,7 @@ const App = () => {
 
         <form onSubmit={handleLogin}>
           <div>
-           username
+            username
             <input type="text" value={username} name="Username"
               onChange={({ target }) => setUsername(target.value)} />
           </div>
@@ -199,19 +177,24 @@ const App = () => {
           </div>
           <button type="submit">login</button>
         </form>
-
-
-        {sortedBlogArray.length > 0 && <h3>Available Blogs</h3>}
-        {sortedBlogArray.map(blog =>
-          <Blog
-            key={blog.id}
-            blog={blog}
-            // ACCESS FIX: Do NOT pass handleLike/handleRemove when user is null (anonymous)
-          />
+        
+        {/* Render blogs here for anonymous users if they exist */}
+        {blogs.length > 0 && <h3>Available Blogs</h3>}
+        {blogs.map(blog => 
+            <Blog
+                key={blog.id}
+                blog={blog}
+                // Only basic view, no like/remove handlers for anonymous view
+            />
         )}
       </div>
     )
   }
+
+  // Sort the blogs array by likes in descending order.
+  // FIX 4: Use || 0 to safely handle null/undefined likes property (prevents sort crash)
+  const sortedBlogArray = [...blogs].sort((a, b) => (b.likes || 0) - (a.likes || 0))
+
   // Logged-in view
   return (
     <div>
@@ -228,12 +211,11 @@ const App = () => {
         />
       </Togglable>
 
-      {/* Blog List: This uses sortedBlogArray by default now */}
+      {/* Blog List */}
       {sortedBlogArray.map(blog =>
         <Blog
           key={blog.id}
           blog={blog}
-          // Pass handlers ONLY when user is logged in
           handleLike={handleLike}
           handleRemove={handleRemove}
           currentUser={user}
