@@ -28,7 +28,7 @@ const Blog = ({ blog, handleLike, handleRemove, currentUser }) => {
   const isCreator = blog.user && currentUser
     && (blog.user.id?.toString() === currentUser.id.toString())
 
-  // Styling
+  // Encapsulated Styling
   const blogStyle = {
     paddingTop: 10,
     paddingLeft: 2,

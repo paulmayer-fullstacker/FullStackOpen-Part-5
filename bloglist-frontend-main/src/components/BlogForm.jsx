@@ -11,7 +11,7 @@ const BlogForm = ({ createBlog, authorName }) => {
 
   const addBlog = (event) => {
     event.preventDefault()
-    
+
     // Call the parent handler with the new blog object
     createBlog({
       title: newTitle,
@@ -28,32 +28,35 @@ const BlogForm = ({ createBlog, authorName }) => {
   return (
     <div>
       <h3>create new</h3>
+      {/* Form element; when submitted, calls the addBlog function */}
       <form onSubmit={addBlog}>
         <div>
           title:
           <input
-            value={newTitle}
-            onChange={({ target }) => setNewTitle(target.value)}
+            value={newTitle}  // The current title value stored in component state
+            onChange={({ target }) => setNewTitle(target.value)}  // When the user types in the input, update the newTitle state with the new value.
             name="Title"
           />
         </div>
+        {/* Author input field (read-only, filled from the logged-in user's data) */}
         <div>
           author:
           <input
-            value={newAuthor} 
-            readOnly // Author is read-only, set to the logged-in user's name
+            value={newAuthor}    // Shows the author's name (logged-in user's name) from state
+            readOnly // Author field is read-only
           />
         </div>
+        {/* URL input field */}
         <div>
           url:
           <input
-            value={newUrl}
-            onChange={({ target }) => setNewUrl(target.value)}
+            value={newUrl}     // Current URL stored in state
+            onChange={({ target }) => setNewUrl(target.value)}   // When typing, update newUrl state
             name="URL"
           />
         </div>
         {/* The 'create' button triggers the submission */}
-        <button type="submit">create</button>
+        <button type="submit">create</button>   {/* Triggers form submission → calls addBlog */}
       </form>
     </div>
   )

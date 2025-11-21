@@ -34,7 +34,7 @@ const mostBlogs = (blogs) => {
     return null
   }
 
-  // Use _.countBy to create an object where: keys = authors and values = their blog counts. Example: { 'Robert C. Martin': 3, 'Edsger W. Dijkstra': 2, ... }
+  // Use _.countBy to create an object where: keys = authors, and values = their blog counts. Example: { 'Robert C. Martin': 3, 'Edsger W. Dijkstra': 2, ... }
   const blogCounts = _.countBy(blogs, 'author')
 
   // Use _.map to convert the author/count object into an array of objects, in the required format: [{ author: 'Robert C. Martin', blogs: 3 }, ...]

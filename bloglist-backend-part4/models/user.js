@@ -20,9 +20,9 @@ const userSchema = new mongoose.Schema({
 userSchema.set('toJSON', {
   transform: (document, returnedObject) => {
     returnedObject.id = returnedObject._id.toString()   // Rename the MongoDB primary key '_id' to 'id' (as a string, not object)
-    delete returnedObject._id                           // Remove the original '_id' property.
-    delete returnedObject.__v                           // Remove the Mongoose version key '__v'.
-    delete returnedObject.passwordHash                  // Ensures the password hash is never sent in responses.
+    delete returnedObject._id                          // Remove the original '_id' property.
+    delete returnedObject.__v                         // Remove the Mongoose version key '__v'.
+    delete returnedObject.passwordHash               // Ensures the password hash is never sent in responses.
   }
 })
 
