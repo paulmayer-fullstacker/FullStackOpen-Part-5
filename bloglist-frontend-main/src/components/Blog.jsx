@@ -39,7 +39,8 @@ const Blog = ({ blog, handleLike, handleRemove, currentUser }) => {
 
   // Content shown by default (Title and Author)
   const defaultView = (
-    <div>
+    // class added for test identification
+    <div className='default-view'>
       {blog.title} {authorName}
       <button onClick={toggleVisibility}>view</button>
     </div>
@@ -47,7 +48,8 @@ const Blog = ({ blog, handleLike, handleRemove, currentUser }) => {
 
   // Content shown when visible (URL, Likes, User)
   const fullView = (
-    <div>
+    // class added for test identification
+    <div className='full-view'>
       {/* Top line with title, author, and the 'hide' button */}
       <div>
         {blog.title} {authorName}
@@ -55,10 +57,9 @@ const Blog = ({ blog, handleLike, handleRemove, currentUser }) => {
       </div>
 
       {/* Blog Details */}
-      <div>{blog.url}</div>
-      <div>
-        likes {blog.likes}
-        {/* FIX: Only render the 'like' button if the handleLike prop is provided (i.e., user is logged in) */}
+      <div className='blog-url'>{blog.url}</div>
+      <div className='blog-likes'>likes {blog.likes}
+        {/* Only render the 'like' button if the handleLike prop is provided (i.e., user is logged in) */}
         {handleLike && <button onClick={likeBlog}>like</button>}
       </div>
       {/* The author's name is displayed */}
@@ -73,7 +74,7 @@ const Blog = ({ blog, handleLike, handleRemove, currentUser }) => {
 
   // Conditional Rendering
   return (
-    <div style={blogStyle}>
+    <div style={blogStyle} className='blog-item'>
       {visible ? fullView : defaultView}
     </div>
   )

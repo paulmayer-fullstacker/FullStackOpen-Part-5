@@ -1,3 +1,4 @@
+// vite.config.js:
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
@@ -11,5 +12,10 @@ export default defineConfig({
         changeOrigin: true
       }
     }
+  },
+  test: {
+    environment: 'jsdom',  // Instruct Vitest to use JSDOM instead of the default Node environment.
+    globals: true,
+    setupFiles: './testSetup.js',
   }
 })
