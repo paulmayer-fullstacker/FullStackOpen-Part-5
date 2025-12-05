@@ -36,8 +36,12 @@ app.use('/api/users', usersRouter)
 // and requests to /api/login passed to the loginRouter.
 app.use('/api/login', loginRouter)
 
-// Error Handling Middleware (MUST be loaded last)
+if (process.env.NODE_ENV === 'test') {
+  const testingRouter = require('./controllers/testing')
+  app.use('/api/testing', testingRouter)
+}
 
+// Error Handling Middleware (MUST be loaded last)
 // Handler for requests to non-existent endpoints (404 Not Found)
 app.use(middleware.unknownEndpoint)
 
