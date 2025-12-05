@@ -23,6 +23,8 @@ To run the end-to-end testing suit:
 - 
 Note: Commands are run from within the respective project’s root directory.
 
+To mitigate networking issues, when working out of office, I installed and used MongoDB Compass. I found this tool very useful, for development testing, in removing potential network and latency issues.  
+
 ---
 
 ## Version Control
